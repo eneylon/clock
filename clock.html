@@ -1,2 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Clock</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap">
+  <style>
+    :root {
+      --color-bg: #00d000;
+      --color-dim: #00a000;
+      --color-active: #ffff00;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--color-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #clock {
+      padding: 20px;
+    }
+    .row {
+      display: flex;
+    }
+    .letter {
+      font-family: 'Roboto Mono', monospace;
+      font-size: clamp(18px, 4vw, 44px);
+      line-height: 1.2;
+      color: var(--color-dim);
+      padding: clamp(8px, 2vw, 20px);
+      transition: color 0.4s ease;
+      user-select: none;
+    }
+    .letter.on {
+      color: var(--color-active);
+    }
+  </style>
+</head>
+<body>
+  <div id="clock"></div>
+  <script>
+       const GRID = [
+      ['I','T','L','I','S','A','S','T','I','M','E'],
+      ['A','C','Q','U','A','R','T','E','R','D','C'],
+      ['T','W','E','N','T','Y','F','I','V','E','X'],
+      ['H','A','L','F','B','T','E','N','F','T','O'],
+      ['P','A','S','T','E','R','U','N','I','N','E'],
+      ['O','N','E','S','I','X','T','H','R','E','E'],
+      ['F','O','U','R','F','I','V','E','T','W','O'],
+      ['E','I','G','H','T','E','L','E','V','E','N'],
+      ['S','E','V','E','N','T','W','E','L','V','E'],
+      ['T','E','N','W','E','O','C','L','O','C','K'],
+    ];
+    const HOURS = [
+      [[8,5],[8,6],[8,7],[8,8],[8,9],[8,10]],
+      [[5,0],[5,1],[5,2]], 
+      [[6,8],[6,9],[6,10]],  
+      [[5,6],[5,7],[5,8],[5,9],[5,10]], 
+      [[6,0],[6,1],[6,2],[6,3]],  
+      [[6,4],[6,5],[6,6],[6,7]], 
+      [[5,3],[5,4],[5,5]],  
+      [[8,0],[8,1],[8,2],[8,3],[8,4]],  
+      [[7,0],[7,1],[7,2],[7,3],[7,4]], 
+      [[4,7],[4,8],[4,9],[4,10]], 
+      [[9,0],[9,1],[9,2]], 
+      [[7,5],[7,6],[7,7],[7,8],[7,9],[7,10]], 
+    ];
+    const MINUTES = [
+      [[9,5],[9,6],[9,7],[9,8],[9,9],[9,10]], 
+      [[2,6],[2,7],[2,8],[2,9]],  
+      [[3,5],[3,6],[3,7]], 
+      [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8]],  
+      [[2,0],[2,1],[2,2],[2,3],[2,4],[2,5]],  
+      [[2,0],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[2,9]], 
+      [[3,0],[3,1],[3,2],[3,3]],  
+      [[2,0],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[2,9]],  
+      [[2,0],[2,1],[2,2],[2,3],[2,4],[2,5]], 
+      [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8]], 
+      [[3,5],[3,6],[3,7]],  
+      [[2,6],[2,7],[2,8],[2,9]], 
+    ];
+    const PAST = [[4,0],[4,1],[4,2],[4,3]];
+    const TO = [[3,9],[3,10]];
+    const IT_IS = [[0,0],[0,1],[0,3],[0,4]]; 
 
-<html><head><script type="text/javascript" src="http://use.typekit.com/jko8gdi.js"></script><script type="text/javascript">try{Typekit.load();}catch(e){}</script><script type="text/javascript">function startup(){ var grid = {'row1':{'a1':'I','a2':'T','a3':'L','a4':'I','a5':'S','a6':'A','a7':'S','a8':'T','a9':'I','a10':'M','a11':'E'}, 'row2':{'a1':'A','a2':'C','a3':'Q','a4':'U','a5':'A','a6':'R','a7':'T','a8':'E','a9':'R','a10':'D','a11':'C'}, 'row3':{'a1':'T','a2':'W','a3':'E','a4':'N','a5':'T','a6':'Y','a7':'F','a8':'I','a9':'V','a10':'E','a11':'X'}, 'row4':{'a1':'H','a2':'A','a3':'L','a4':'F','a5':'B','a6':'T','a7':'E','a8':'N','a9':'F','a10':'T','a11':'O'}, 'row5':{'a1':'P','a2':'A','a3':'S','a4':'T','a5':'E','a6':'R','a7':'U','a8':'N','a9':'I','a10':'N','a11':'E'}, 'row6':{'a1':'O','a2':'N','a3':'E','a4':'S','a5':'I','a6':'X','a7':'T','a8':'H','a9':'R','a10':'E','a11':'E'}, 'row7':{'a1':'F','a2':'O','a3':'U','a4':'R','a5':'F','a6':'I','a7':'V','a8':'E','a9':'T','a10':'W','a11':'O'}, 'row8':{'a1':'E','a2':'I','a3':'G','a4':'H','a5':'T','a6':'E','a7':'L','a8':'E','a9':'V','a10':'E','a11':'N'}, 'row9':{'a1':'S','a2':'E','a3':'V','a4':'E','a5':'N','a6':'T','a7':'W','a8':'E','a9':'L','a10':'V','a11':'E'}, 'row10':{'a1':'T','a2':'E','a3':'N','a4':'W','a5':'E','a6':'O','a7':'C','a8':'L','a9':'O','a10':'C','a11':'K'} }; var content=""; var i=1; while (i<11){    content = content+"<div class='line'>";    var j=1;    while (j<12){        content = content + "<div class='letter' id='row"+i+"col"+j+"'>"+eval('grid.row'+i+'.a'+j)+"</div>";        j++    }    content = content + "</div>";    i++; } document.getElementById("main").innerHTML = content;}function update(state){ var hours = ["row9col6,row9col7,row9col8,row9col9,row9col10,row9col11", "row6col1,row6col2,row6col3", "row7col9,row7col10,row7col11", "row6col7,row6col8,row6col9,row6col10,row6col11", "row7col1,row7col2,row7col3,row7col4", "row7col5,row7col6,row7col7,row7col8", "row6col4,row6col5,row6col6", "row9col1,row9col2,row9col3,row9col4,row9col5", "row8col1,row8col2,row8col3,row8col4,row8col5", "row5col8,row5col9,row5col10,row5col11", "row10col1,row10col2,row10col3", "row8col6,row8col7,row8col8,row8col9,row8col10,row8col11"]; var mins = ["row10col6,row10col7,row10col8,row10col9,row10col10,row10col11", "row3col7,row3col8,row3col9,row3col10", "row4col6,row4col7,row4col8", "row2col3,row2col4,row2col5,row2col6,row2col7,row2col8,row2col9", "row3col1,row3col2,row3col3,row3col4,row3col5,row3col6", "row3col1,row3col2,row3col3,row3col4,row3col5,row3col6,row3col7,row3col8,row3col9,row3col10", "row4col1,row4col2,row4col3,row4col4", "row3col1,row3col2,row3col3,row3col4,row3col5,row3col6,row3col7,row3col8,row3col9,row3col10", "row3col1,row3col2,row3col3,row3col4,row3col5,row3col6", "row2col3,row2col4,row2col5,row2col6,row2col7,row2col8,row2col9", "row4col6,row4col7,row4col8", "row3col7,row3col8,row3col9,row3col10"]; var pitch = ["", "row5col1,row5col2,row5col3,row5col4", "row4col10,row4col11"]; if (!(state=="")){  var d = new Date(state);  var h = d.getHours()%12;  var m = parseInt(d.getMinutes()/5);  if (m>6) {h++;}  if (h>11) {h=0;}  var hhrow = hours[h].split(",");  for (i=0;i<hhrow.length;i++){   document.getElementById(hhrow[i]).style.color = '#00c000';  }  var mmrow = mins[m].split(",");  for (i=0;i<mmrow.length;i++){   document.getElementById(mmrow[i]).style.color = '#00c000';  }  var p; if (m<7){p=1;} else {p=2;} if (m==0) {p=0;}  var pprow = pitch[p].split(",");  for (i=0;i<pprow.length;i++){   document.getElementById(pprow[i]).style.color = '#00c000';  } } else {  document.getElementById('row1col1').style.color = '#ffff00';  document.getElementById('row1col2').style.color = '#ffff00';  document.getElementById('row1col4').style.color = '#ffff00';  document.getElementById('row1col5').style.color = '#ffff00'; }  var d = new Date(); var h = d.getHours()%12; var m = parseInt(d.getMinutes()/5); if (m>6) {h++;} if (h>11) {h=0;} var hhrow = hours[h].split(","); for (i=0;i<hhrow.length;i++){  document.getElementById(hhrow[i]).style.color = '#ffff00'; } var mmrow = mins[m].split(","); for (i=0;i<mmrow.length;i++){  document.getElementById(mmrow[i]).style.color = '#ffff00'; } var p; if (m<7){p=1;} else {p=2;} if (m==0) {p=0;} var pprow = pitch[p].split(","); for (i=0;i<pprow.length;i++){  document.getElementById(pprow[i]).style.color = '#ffff00'; } setInterval('update("'+d+'")', 60000);  }</script><style media="screen" type="text/css">body {	margin: 0;	padding: 0;	border: 0;	background-color: #00d000; }.line {	line-height: 16px;	margin-left: 20px;	margin-top: 10px;	display: block; }.letter {	font-size: 44px;	line-height: 52px;	color: #00C000;	display: inline;	padding: 40px;	font-family: "droid-sans-mono", sans-serif; }</style></head><!--body onLoad="alert(window.innerWidth+':'+window.innerHeight)"--><!--body onLoad="startup();highlight();"--><body onLoad="startup();update('');"><div id="main"></div><!--div class="line"><div class="letter" id="1" style="color:#FFFF00">I</div><div class="letter" id="2" style="color:#FFFF00">T</div><div class="letter" id="3">A</div><div class="letter" id="4">I</div></div><div class="line"><div class="letter" id="11">A</div><div class="letter" id="12">M</div><div class="letter" id="13">V</div><div class="letter" id="14">S</div></div--></body></html>
+    function buildGrid() {
+      const clock = document.getElementById('clock');
+      GRID.forEach((rowData, r) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'row';
+        rowData.forEach((char, c) => {
+          const cell = document.createElement('div');
+          cell.className = 'letter';
+          cell.id = `r${r}c${c}`;
+          cell.textContent = char;
+          rowEl.appendChild(cell);
+        });
+        clock.appendChild(rowEl);
+      });
+    }
+    function allOff() {
+      document.querySelectorAll('.letter').forEach(el => el.classList.remove('on'));
+    }
+    function light(cells) {
+      cells.forEach(([r, c]) => {
+        const el = document.getElementById(`r${r}c${c}`);
+        if (el) el.classList.add('on');
+      });
+    }
+    function update() {
+      const now   = new Date();
+      const mins  = now.getMinutes();
+      const m     = Math.floor(mins / 5);   // 0–11
+      const isPast = m <= 6;
+      let   h     = now.getHours() % 12;
+      if (!isPast) h = (h + 1) % 12;
+      allOff();
+      light(IT_IS);
+      light(HOURS[h]);
+      light(MINUTES[m]);
+      if (m === 0) { /* O'CLOCK — no PAST/TO */ }
+      else if (isPast) { light(PAST); }
+      else { light(TO); }
+    }
+    buildGrid();
+    update();
+    function scheduleTick() {
+      const now   = new Date();
+      const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+      setTimeout(() => {
+        update();
+        setInterval(update, 60_000);
+      }, msUntilNextMinute);
+    }
+    scheduleTick();
+  </script>
+</body>
+</html>
